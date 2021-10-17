@@ -1,0 +1,16 @@
+key_trigger {
+  input: KEY_SPACE
+  action: "space"
+}
+key_trigger {
+  input: KEY_R
+  action: "restart"
+}
+key_trigger {
+  input: KEY_P
+  action: "pause"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "touch"
+}

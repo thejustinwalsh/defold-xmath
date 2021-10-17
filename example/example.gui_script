@@ -1,0 +1,50 @@
+local mem_format = '%dkb';
+local aps_format = '%dkb';
+local last_mem = 0
+local start_mem = 0
+local alloc_total = 0
+local aps = 0
+local start = 0
+
+local off_color = vmath.vector4(.66, 0, 0, 1);
+local on_color = vmath.vector4(0, .66, 0, 1);
+
+function init(self)
+	-- cache nodes
+	self.mem_node = gui.get_node("mem");
+	self.aps_node = gui.get_node("aps");
+	self.xmath_node = gui.get_node("xmath");
+
+	-- reset timer
+	start = socket.gettime()
+end
+
+function final(self)
+	-- Add finalization code here
+	-- Learn more: https://defold.com/manuals/script/
+	-- Remove this function if not needed
+end
+
+function update(self, dt)
+	local mem = collectgarbage("count")
+	if (mem > last_mem) then
+		alloc_total = alloc_total + (mem - last_mem)
+	end
+	aps = alloc_total / (socket.gettime() - start);
+	last_mem = mem
+	
+	gui.set_text(self.mem_node,   string.format(mem_format, mem));
+	gui.set_text(self.aps_node,   string.format(aps_format, aps));
+end
+
+function on_message(self, message_id, message, sender)
+	if (message_id == hash("change_mode")) then
+		-- set mode text
+		gui.set_text(self.xmath_node, message.data);
+		gui.set_color(self.xmath_node, message.data == "ON" and on_color or off_color);
+
+		-- reset timer
+		start = socket.gettime()
+		alloc_total = 0
+	end		
+end

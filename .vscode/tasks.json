@@ -1,0 +1,20 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "defold",
+			"action": "build",
+			"configuration": "debug",
+			"platform": "current",
+			"problemMatcher": [
+				"$defold-build"
+			],
+			"label": "defold: build",
+			"detail": "Build the project for running, debugging or testing",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
