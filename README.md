@@ -1,7 +1,7 @@
 # xMath Extension
 > Defold Math Library ❌ ~~allocations~~
 
-A re-imagining of vmath functions that avoid allocations buy taking the output as the first argument instead of returning a new Vector3, Vector4, or Quat requiring an allocation.
+A re-imagining of vmath functions that avoid allocations by taking the output as the first argument instead of returning a new Vector3, Vector4, or Quat requiring an allocation.
 
 ```lua
 go.property("dir", vmath.vector3(0, 1, 0))
