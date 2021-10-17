@@ -7,6 +7,7 @@ shared_state = 1
 [display]
 width = 960
 height = 640
+high_dpi = 1
 
 [project]
 title = xmath-extension
@@ -16,4 +17,10 @@ include_dirs = xmath
 
 [sprite]
 max_count = 1024
+
+[factory]
+max_count = 1024
+
+[html5]
+htmlfile = /manifests/web/template.html
 
