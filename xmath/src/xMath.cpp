@@ -1,9 +1,7 @@
-// Extension lib defines
 #define LIB_NAME "xmath"
 #define MODULE_NAME "xmath"
 #define DLIB_LOG_DOMAIN "xMath"
 
-// include the Defold SDK
 #include <dmsdk/sdk.h>
 
 static int xMath_add(lua_State* L)
@@ -130,8 +128,7 @@ static int xMath_rotate(lua_State* L)
     return 0;
 }
 
-// Functions exposed to Lua
-static const luaL_reg Module_methods[] =
+static const luaL_reg xMathModule_methods[] =
 {
     {"add", xMath_add},
     {"sub", xMath_sub},
@@ -143,43 +140,38 @@ static const luaL_reg Module_methods[] =
     {0, 0}
 };
 
-static void LuaInit(lua_State* L)
+static void xMathLuaInit(lua_State* L)
 {
     int top = lua_gettop(L);
 
-    // Register lua names
-    luaL_register(L, MODULE_NAME, Module_methods);
+    luaL_register(L, MODULE_NAME, xMathModule_methods);
 
     lua_pop(L, 1);
     assert(top == lua_gettop(L));
 }
 
-dmExtension::Result AppInitializeMyExtension(dmExtension::AppParams* params)
+dmExtension::Result xMathAppInitialize(dmExtension::AppParams* params)
 {
     return dmExtension::RESULT_OK;
 }
 
-dmExtension::Result InitializeMyExtension(dmExtension::Params* params)
+dmExtension::Result xMathInitialize(dmExtension::Params* params)
 {
-    // Init Lua
-    LuaInit(params->m_L);
+    xMathLuaInit(params->m_L);
     dmLogInfo("Registered %s Extension\n", MODULE_NAME);
     return dmExtension::RESULT_OK;
 }
 
-dmExtension::Result AppFinalizeMyExtension(dmExtension::AppParams* params)
+dmExtension::Result xMathAppFinalize(dmExtension::AppParams* params)
 {
     return dmExtension::RESULT_OK;
 }
 
-dmExtension::Result FinalizeMyExtension(dmExtension::Params* params)
+dmExtension::Result xMathFinalize(dmExtension::Params* params)
 {
     return dmExtension::RESULT_OK;
 }
 
 // Defold SDK uses a macro for setting up extension entry points:
-//
-// DM_DECLARE_EXTENSION(symbol, name, app_init, app_final, init, update, on_event, final)
-
 // It must match the name field in the `ext.manifest`
-DM_DECLARE_EXTENSION(xMath, LIB_NAME, AppInitializeMyExtension, AppFinalizeMyExtension, InitializeMyExtension, 0, 0, FinalizeMyExtension)
+DM_DECLARE_EXTENSION(xMath, LIB_NAME, xMathAppInitialize, xMathAppFinalize, xMathInitialize, 0, 0, xMathFinalize)
