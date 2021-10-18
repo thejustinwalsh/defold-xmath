@@ -84,6 +84,61 @@ static int xMath_div(lua_State* L)
     return 0;
 }
 
+static int xMath_cross(lua_State* L)
+{
+    if (dmScript::IsVector3(L, 1))
+    {
+        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
+        Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 2);
+        Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 3);
+        *out = Vectormath::Aos::cross(*lhs, *rhs);
+    }
+    
+    return 0;
+}
+
+static int xMath_lerp(lua_State* L)
+{
+    if (dmScript::IsVector3(L, 1))
+    {
+        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 3);
+        Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 4);
+        *out = Vectormath::Aos::lerp(t, *lhs, *rhs);
+    }
+    else if (dmScript::IsVector4(L, 1))
+    {
+        Vectormath::Aos::Vector4 *out = dmScript::CheckVector4(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Vector4 *lhs = dmScript::CheckVector4(L, 3);
+        Vectormath::Aos::Vector4 *rhs = dmScript::CheckVector4(L, 4);
+        *out = Vectormath::Aos::lerp(t, *lhs, *rhs);
+    }
+    
+    return 0;
+}
+
+static int xMath_mul_per_elem(lua_State* L)
+{
+    if (dmScript::IsVector3(L, 1))
+    {
+        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
+        Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 2);
+        Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 3);
+        *out = Vectormath::Aos::mulPerElem(*lhs, *rhs);
+    }
+    else if (dmScript::IsVector4(L, 1))
+    {
+        Vectormath::Aos::Vector4 *out = dmScript::CheckVector4(L, 1);
+        Vectormath::Aos::Vector4 *lhs = dmScript::CheckVector4(L, 2);
+        Vectormath::Aos::Vector4 *rhs = dmScript::CheckVector4(L, 3);
+        *out = Vectormath::Aos::mulPerElem(*lhs, *rhs);
+    }
+     
+    return 0;
+}
+
 static int xMath_normalize(lua_State* L)
 {
     if (dmScript::IsVector3(L, 1))
@@ -102,19 +157,6 @@ static int xMath_normalize(lua_State* L)
     return 0;
 }
 
-static int xMath_cross(lua_State* L)
-{
-    if (dmScript::IsVector3(L, 1))
-    {
-        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
-        Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 2);
-        Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 3);
-        *out = Vectormath::Aos::cross(*lhs, *rhs);
-    }
-    
-    return 0;
-}
-
 static int xMath_rotate(lua_State* L)
 {
     if (dmScript::IsVector3(L, 1))
@@ -128,15 +170,42 @@ static int xMath_rotate(lua_State* L)
     return 0;
 }
 
+static int xMath_slerp(lua_State* L)
+{
+    if (dmScript::IsVector3(L, 1))
+    {
+        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 3);
+        Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 4);
+        *out = Vectormath::Aos::slerp(t, *lhs, *rhs);
+    }
+    else if (dmScript::IsVector4(L, 1))
+    {
+        Vectormath::Aos::Vector4 *out = dmScript::CheckVector4(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Vector4 *lhs = dmScript::CheckVector4(L, 3);
+        Vectormath::Aos::Vector4 *rhs = dmScript::CheckVector4(L, 4);
+        *out = Vectormath::Aos::slerp(t, *lhs, *rhs);
+    }
+    
+    return 0;
+}
+
 static const luaL_reg xMathModule_methods[] =
 {
+    // Arithmetic
     {"add", xMath_add},
     {"sub", xMath_sub},
     {"mul", xMath_mul},
     {"div", xMath_div},
-    {"normalize", xMath_normalize},
+    // Vector
     {"cross", xMath_cross},
+    {"lerp", xMath_lerp},
+    {"mul_per_elem", xMath_mul_per_elem},
+    {"normalize", xMath_normalize},
     {"rotate", xMath_rotate},
+    {"slerp", xMath_slerp},
     {0, 0}
 };
 
