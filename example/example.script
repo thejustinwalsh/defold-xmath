@@ -2,7 +2,6 @@
 local SPRITE_MAX = 500;
 local sprites = {}
 local bounds = vmath.vector3()
-local bounds_scale = 4
 local use_xmath = true
 local paused = false
 
@@ -18,15 +17,15 @@ function init(self)
 	collectgarbage('setpause', 1000);
 	
 	-- capture window bounds
-	local width, height = window.get_size()
-	bounds.x = width; bounds.y = height;
+	bounds.x = tonumber(sys.get_config("display.width"))
+	bounds.y = tonumber(sys.get_config("display.height"));
 	
 	for i = 1, SPRITE_MAX do
 		local dir = vmath.vector3(0, 1, 0)
 		local t = math.rad(math.random(0, 360))
 		dir.y = math.sin(t); dir.x = math.cos(t);
 		
-		local pos = vmath.vector3(bounds.x / bounds_scale, bounds.y / bounds_scale, 0)
+		local pos = vmath.vector3(bounds.x / 2, bounds.y / 2, 0)
 
 		local id = factory.create("#factory", pos);
 		sprites[#sprites + 1] = {
@@ -52,9 +51,9 @@ function update(self, dt)
 			end
 
 			-- reflect
-			if (v.pos.x < 0 or v.pos.x > bounds.x / 2) then
+			if (v.pos.x < 0 or v.pos.x > bounds.x) then
 				v.dir.x = v.dir.x * -1
-			elseif (v.pos.y < 0 or v.pos.y > bounds.y / 2) then
+			elseif (v.pos.y < 0 or v.pos.y > bounds.y) then
 				v.dir.y = v.dir.y * -1
 			end
 
