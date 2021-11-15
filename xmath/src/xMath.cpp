@@ -347,6 +347,195 @@ static int xMath_slerp(lua_State* L)
     return 0;
 }
 
+//* Matrix
+//* ----------------------------------------------------------------------------
+
+static int xMath_matrix(lua_State* L)
+{
+    if (lua_gettop(L) == 0 && dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        *out = Vectormath::Aos::Matrix4::identity();
+    }
+    else if (lua_gettop(L) == 1 && dmScript::IsMatrix4(L, 1) && dmScript::IsMatrix4(L, 2))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        Vectormath::Aos::Matrix4 *in = dmScript::CheckMatrix4(L, 1);
+        *out = *in;
+    }
+    
+    return 0;
+}
+
+static int xMath_matrix_axis_angle(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        Vectormath::Aos::Vector3 *axis = dmScript::CheckVector3(L, 2);
+        float angle = (float) luaL_checknumber(L, 3);
+        *out = Vectormath::Aos::Matrix4::rotation(angle, *axis);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_from_quat(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        Vectormath::Aos::Quat *quat = dmScript::CheckQuat(L, 2);
+        *out = Vectormath::Aos::Matrix4::rotation(*quat);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_frustum(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        float left = (float) luaL_checknumber(L, 2);
+        float right = (float) luaL_checknumber(L, 3);
+        float bottom = (float) luaL_checknumber(L, 4);
+        float top = (float) luaL_checknumber(L, 5);
+        float near_z = (float) luaL_checknumber(L, 6);
+        if(near_z == 0.0f) near_z = 0.00001f;
+        float far_z = (float) luaL_checknumber(L, 7);
+        *out = Vectormath::Aos::Matrix4::frustum(left, right, bottom, top, near_z, far_z);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_inv(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        Vectormath::Aos::Matrix4 *in = dmScript::CheckMatrix4(L, 2);
+        *out = Vectormath::Aos::inverse(*in);
+    }
+    return 0;
+}
+
+static int xMath_matrix_look_at(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        Vectormath::Aos::Point3 eye = Vectormath::Aos::Point3(*dmScript::CheckVector3(L, 2));
+        Vectormath::Aos::Point3 target = Vectormath::Aos::Point3(*dmScript::CheckVector3(L, 3));
+        Vectormath::Aos::Vector3 up = *dmScript::CheckVector3(L, 4);
+        *out = Vectormath::Aos::Matrix4::lookAt(eye, target, up);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_orthographic(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        float left = (float) luaL_checknumber(L, 2);
+        float right = (float) luaL_checknumber(L, 3);
+        float bottom = (float) luaL_checknumber(L, 4);
+        float top = (float) luaL_checknumber(L, 5);
+        float near_z = (float) luaL_checknumber(L, 6);
+        float far_z = (float) luaL_checknumber(L, 7);
+        *out = Vectormath::Aos::Matrix4::orthographic(left, right, bottom, top, near_z, far_z);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_ortho_inv(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        Vectormath::Aos::Matrix4 *in = dmScript::CheckMatrix4(L, 2);
+        *out = Vectormath::Aos::orthoInverse(*in);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_perspective(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        float fov = (float) luaL_checknumber(L, 2);
+        float aspect = (float) luaL_checknumber(L, 3);
+        float near_z = (float) luaL_checknumber(L, 4);
+        float far_z = (float) luaL_checknumber(L, 5);
+        if (near_z == 0.0f) near_z = 0.00001f;
+        *out = Vectormath::Aos::Matrix4::perspective(fov, aspect, near_z, far_z);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_rotation_x(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        float angle = (float) luaL_checknumber(L, 2);
+        *out = Vectormath::Aos::Matrix4::rotationX(angle);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_rotation_y(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        float angle = (float) luaL_checknumber(L, 2);
+        *out = Vectormath::Aos::Matrix4::rotationY(angle);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_rotation_z(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        float angle = (float) luaL_checknumber(L, 2);
+        *out = Vectormath::Aos::Matrix4::rotationZ(angle);
+    }
+
+    return 0;
+}
+
+static int xMath_matrix_translation(lua_State* L)
+{
+    if (dmScript::IsMatrix4(L, 1))
+    {
+        Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
+        if (dmScript::IsVector3(L, 2))
+        {
+            Vectormath::Aos::Vector3 *v = dmScript::CheckVector3(L, 2);
+            *out = Vectormath::Aos::Matrix4::translation(*v);
+        }
+        else if (dmScript::IsVector4(L, 2))
+        {
+            Vectormath::Aos::Vector4 *v = dmScript::CheckVector4(L, 2);
+            *out = Vectormath::Aos::Matrix4::translation(v->getXYZ());
+        }
+    }
+    return 0;
+}
+
+
 //* Native Extension Bindings
 //* ----------------------------------------------------------------------------
 
@@ -375,6 +564,20 @@ static const luaL_reg xMathModule_methods[] =
     //* Vector + Quat
     {"lerp", xMath_lerp},
     {"slerp", xMath_slerp},
+    //* Matrix
+    {"matrix", xMath_matrix},
+    {"matrix_axis_angle", xMath_matrix_axis_angle},
+    {"matrix_from_quat", xMath_matrix_from_quat},
+    {"matrix_frustum", xMath_matrix_frustum},
+    {"matrix_inv", xMath_matrix_inv},
+    {"matrix_look_at", xMath_matrix_look_at},
+    {"matrix4_orthographic", xMath_matrix_orthographic},
+    {"matrix_ortho_inv", xMath_matrix_ortho_inv},
+    {"matrix4_perspective", xMath_matrix_perspective},
+    {"matrix_rotation_x", xMath_matrix_rotation_x},
+    {"matrix_rotation_y", xMath_matrix_rotation_y},
+    {"matrix_rotation_z", xMath_matrix_rotation_z},
+    {"matrix_translation", xMath_matrix_translation},
     {0, 0}
 };
 
