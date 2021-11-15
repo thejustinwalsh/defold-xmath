@@ -1,4 +1,4 @@
-name: "main"
+name: "xmath-example"
 scale_along_z: 0
 embedded_instances {
   id: "go"
