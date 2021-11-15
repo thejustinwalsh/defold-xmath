@@ -4,6 +4,9 @@
 
 #include <dmsdk/sdk.h>
 
+//* Arithmetic
+//* ----------------------------------------------------------------------------
+
 static int xMath_add(lua_State* L)
 {
     if (dmScript::IsVector3(L, 1))
@@ -84,6 +87,9 @@ static int xMath_div(lua_State* L)
     return 0;
 }
 
+//* Vector
+//* ----------------------------------------------------------------------------
+
 static int xMath_cross(lua_State* L)
 {
     if (dmScript::IsVector3(L, 1))
@@ -92,28 +98,6 @@ static int xMath_cross(lua_State* L)
         Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 2);
         Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 3);
         *out = Vectormath::Aos::cross(*lhs, *rhs);
-    }
-    
-    return 0;
-}
-
-static int xMath_lerp(lua_State* L)
-{
-    if (dmScript::IsVector3(L, 1))
-    {
-        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
-        float t = (float) luaL_checknumber(L, 2);
-        Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 3);
-        Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 4);
-        *out = Vectormath::Aos::lerp(t, *lhs, *rhs);
-    }
-    else if (dmScript::IsVector4(L, 1))
-    {
-        Vectormath::Aos::Vector4 *out = dmScript::CheckVector4(L, 1);
-        float t = (float) luaL_checknumber(L, 2);
-        Vectormath::Aos::Vector4 *lhs = dmScript::CheckVector4(L, 3);
-        Vectormath::Aos::Vector4 *rhs = dmScript::CheckVector4(L, 4);
-        *out = Vectormath::Aos::lerp(t, *lhs, *rhs);
     }
     
     return 0;
@@ -170,6 +154,169 @@ static int xMath_rotate(lua_State* L)
     return 0;
 }
 
+static int xMath_vector(lua_State* L)
+{
+    if (dmScript::IsVector3(L, 1))
+    {
+        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
+        *out = Vectormath::Aos::Vector3(0, 0, 0);
+    }
+    else if (dmScript::IsVector4(L, 1))
+    {
+        Vectormath::Aos::Vector4 *out = dmScript::CheckVector4(L, 1);
+        *out = Vectormath::Aos::Vector4(0, 0, 0, 1);
+    }
+
+    return 0;
+}
+
+//* Quat
+//* ----------------------------------------------------------------------------
+
+static int xMath_conj(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        Vectormath::Aos::Quat *a = dmScript::CheckQuat(L, 2);
+        *out = Vectormath::Aos::conj(*a);
+    }
+
+    return 0;
+}
+
+static int xMath_quat_axis_angle(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        Vectormath::Aos::Vector3 *axis = dmScript::CheckVector3(L, 2);
+        float angle = (float) luaL_checknumber(L, 3);
+        *out = Vectormath::Aos::Quat(*axis, angle);
+    }
+
+    return 0;
+}
+
+static int xMath_quat_basis(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        Vectormath::Aos::Vector3 *x = dmScript::CheckVector3(L, 2);
+        Vectormath::Aos::Vector3 *y = dmScript::CheckVector3(L, 3);
+        Vectormath::Aos::Vector3 *z = dmScript::CheckVector3(L, 4);
+        Vectormath::Aos::Matrix3 m;
+        m.setCol0(*x);
+        m.setCol1(*y);
+        m.setCol2(*z);
+        *out = Vectormath::Aos::Quat(m);
+    }
+
+    return 0;
+}
+
+static int xMath_quat_from_to(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        Vectormath::Aos::Vector3 *from = dmScript::CheckVector3(L, 2);
+        Vectormath::Aos::Vector3 *to = dmScript::CheckVector3(L, 3);
+        *out = Vectormath::Aos::Quat::rotation(*from, *to);
+    }
+    
+    return 0;
+}
+
+static int xMath_quat_rotation_x(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        float angle = (float) luaL_checknumber(L, 2);
+        *out = Vectormath::Aos::Quat::rotationX(angle);
+    }
+
+    return 0;
+}
+
+static int xMath_quat_rotation_y(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        float angle = (float) luaL_checknumber(L, 2);
+        *out = Vectormath::Aos::Quat::rotationY(angle);
+    }
+
+    return 0;
+}
+
+static int xMath_quat_rotation_z(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        float angle = (float) luaL_checknumber(L, 2);
+        *out = Vectormath::Aos::Quat::rotationZ(angle);
+    }
+
+    return 0;
+}
+
+static int xMath_quat(lua_State* L)
+{
+    if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        *out = Vectormath::Aos::Quat::identity();
+    }
+
+    return 0;
+}
+
+//* Vector + Quat
+//* ----------------------------------------------------------------------------
+
+static int xMath_lerp(lua_State* L)
+{
+    if (lua_isnumber(L, 1))
+    {
+        float out = luaL_checknumber(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        float lhs = (float) luaL_checknumber(L, 3);
+        float rhs = (float) luaL_checknumber(L, 4);
+        out = (lhs + ((rhs - lhs) * t));
+    }
+    else if (dmScript::IsVector3(L, 1))
+    {
+        Vectormath::Aos::Vector3 *out = dmScript::CheckVector3(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Vector3 *lhs = dmScript::CheckVector3(L, 3);
+        Vectormath::Aos::Vector3 *rhs = dmScript::CheckVector3(L, 4);
+        *out = Vectormath::Aos::lerp(t, *lhs, *rhs);
+    }
+    else if (dmScript::IsVector4(L, 1))
+    {
+        Vectormath::Aos::Vector4 *out = dmScript::CheckVector4(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Vector4 *lhs = dmScript::CheckVector4(L, 3);
+        Vectormath::Aos::Vector4 *rhs = dmScript::CheckVector4(L, 4);
+        *out = Vectormath::Aos::lerp(t, *lhs, *rhs);
+    }
+    else if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Quat *lhs = dmScript::CheckQuat(L, 3);
+        Vectormath::Aos::Quat *rhs = dmScript::CheckQuat(L, 4);
+        *out = Vectormath::Aos::slerp(t, *lhs, *rhs);
+    }
+    
+    return 0;
+}
+
 static int xMath_slerp(lua_State* L)
 {
     if (dmScript::IsVector3(L, 1))
@@ -188,23 +335,45 @@ static int xMath_slerp(lua_State* L)
         Vectormath::Aos::Vector4 *rhs = dmScript::CheckVector4(L, 4);
         *out = Vectormath::Aos::slerp(t, *lhs, *rhs);
     }
+    else if (dmScript::IsQuat(L, 1))
+    {
+        Vectormath::Aos::Quat *out = dmScript::CheckQuat(L, 1);
+        float t = (float) luaL_checknumber(L, 2);
+        Vectormath::Aos::Quat *lhs = dmScript::CheckQuat(L, 3);
+        Vectormath::Aos::Quat *rhs = dmScript::CheckQuat(L, 4);
+        *out = Vectormath::Aos::slerp(t, *lhs, *rhs);
+    }
     
     return 0;
 }
 
+//* Native Extension Bindings
+//* ----------------------------------------------------------------------------
+
 static const luaL_reg xMathModule_methods[] =
 {
-    // Arithmetic
+    //* Arithmetic
     {"add", xMath_add},
     {"sub", xMath_sub},
     {"mul", xMath_mul},
     {"div", xMath_div},
-    // Vector
+    //* Vector
     {"cross", xMath_cross},
-    {"lerp", xMath_lerp},
     {"mul_per_elem", xMath_mul_per_elem},
     {"normalize", xMath_normalize},
     {"rotate", xMath_rotate},
+    {"vector", xMath_vector},
+    //* Quat
+    {"conj", xMath_conj},
+    {"quat_axis_angle", xMath_quat_axis_angle},
+    {"quat_basis", xMath_quat_basis},
+    {"quat_from_to", xMath_quat_from_to},
+    {"quat_rotation_x", xMath_quat_rotation_x},
+    {"quat_rotation_y", xMath_quat_rotation_x},
+    {"quat_rotation_z", xMath_quat_rotation_x},
+    {"quat", xMath_quat},
+    //* Vector + Quat
+    {"lerp", xMath_lerp},
     {"slerp", xMath_slerp},
     {0, 0}
 };
