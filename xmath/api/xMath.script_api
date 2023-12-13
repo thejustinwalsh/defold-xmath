@@ -1,0 +1,304 @@
+- name: xmath
+  type: table
+  desc: Mathematical operations for vectors, quaternions, and matrices
+  members:
+    - name: add
+      type: function
+      desc: "Add one vector to another."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+        - name: v1
+          type: [vector3, vector4]
+        - name: v2
+          type: [vector3, vector4]
+
+    - name: sub
+      type: function
+      desc: "Subtract one vector from another."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+        - name: v1
+          type: [vector3, vector4]
+        - name: v2
+          type: [vector3, vector4]
+
+    - name: mul
+      type: function
+      desc: "Multiply a vector by a scalar."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+        - name: v
+          type: [vector3, vector4]
+        - name: n
+          type: number
+
+    - name: div
+      type: function
+      desc: "Divide a vector by a scalar."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+        - name: v
+          type: [vector3, vector4]
+        - name: n
+          type: number
+
+    - name: cross
+      type: function
+      desc: "Calculate the cross product of two vectors."
+      parameters:
+        - name: v_in_place
+          type: vector3
+        - name: v1
+          type: vector3
+        - name: v2
+          type: vector3
+
+    - name: mul_per_elem
+      type: function
+      desc: "Perform element-wise multiplication between two vectors."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+        - name: v1
+          type: [vector3, vector4]
+        - name: v2
+          type: [vector3, vector4]
+
+    - name: normalize
+      type: function
+      desc: "Normalize a vector."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+        - name: v1
+          type: [vector3, vector4]
+
+    - name: rotate
+      type: function
+      desc: "Rotate a vector by a quaternion."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+        - name: q
+          type: quaternion
+        - name: v1
+          type: [vector3, vector4]
+
+    - name: vector
+      type: function
+      desc: "Set the value of a vector to (0, 0, 0) or (0, 0, 0, 1)."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4]
+
+    - name: conj
+      type: function
+      desc: "Calculate the conjugate of a quaternion."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: q1
+          type: quaternion
+
+    - name: quat_axis_angle
+      type: function
+      desc: "Set the value of a quaternion from an axis and an angle."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: v
+          type: vector3
+        - name: angle
+          type: number
+
+    - name: quat_basis
+      type: function
+      desc: "Set the value of a quaternion from x, y, and z base unit vectors."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: x
+          type: vector3
+        - name: y
+          type: vector3
+        - name: z
+          type: vector3
+
+    - name: quat_from_to
+      type: function
+      desc: "Set the value of a quaternion to rotate from one vector to another."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: v1
+          type: vector3
+        - name: v2
+          type: vector3
+
+    - name: quat_rotation_x
+      type: function
+      desc: "Set the value of a quaternion for rotation around the x-axis."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: angle
+          type: number
+
+    - name: quat_rotation_y
+      type: function
+      desc: "Set the value of a quaternion for rotation around the y-axis."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: angle
+          type: number
+
+    - name: quat_rotation_z
+      type: function
+      desc: "Set the value of a quaternion for rotation around the z-axis."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: angle
+          type: number
+
+    - name: quat
+      type: function
+      desc: "Set the value of a quaternion to (0, 0, 0, 1)."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+
+    - name: lerp
+      type: function
+      desc: "Linearly interpolate between two vectors or quaternions."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4, quaternion]
+        - name: t
+          type: number
+        - name: v1
+          type: [vector3, vector4, quaternion]
+        - name: v2
+          type: [vector3, vector4, quaternion]
+
+    - name: slerp
+      type: function
+      desc: "Spherically interpolate between two vectors or quaternions."
+      parameters:
+        - name: v_in_place
+          type: [vector3, vector4, quaternion]
+        - name: t
+          type: number
+        - name: v1
+          type: [vector3, vector4, quaternion]
+        - name: v2
+          type: [vector3, vector4, quaternion]
+
+    - name: matrix
+      type: function
+      desc: "Set the value of a matrix to the identity matrix or copy another matrix."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: m1
+          type: matrix4
+
+    - name: matrix_axis_angle
+      type: function
+      desc: "Set the value of a matrix for rotation around an axis by an angle."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: v
+          type: vector3
+        - name: angle
+          type: number
+
+    - name: matrix_from_quat
+      type: function
+      desc: "Set the value of a matrix from a quaternion."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: q
+          type: quaternion
+
+    - name: matrix_frustum
+      type: function
+      desc: "Set the value of a frustum matrix from given values."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: left
+          type: number
+        - name: right
+          type: number
+        - name: bottom
+          type: number
+        - name: top
+          type: number
+        - name: near
+          type: number
+        - name: far
+          type: number
+
+    - name: matrix_inv
+      type: function
+      desc: "Calculate the inverse of a matrix."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: m1
+          type: matrix4
+
+    - name: matrix_mul
+      type: function
+      desc: "Multiply two matrices."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: m1
+          type: matrix4
+        - name: m2
+          type: matrix4
+
+    - name: matrix_rotate_x
+      type: function
+      desc: "Set the value of a matrix for rotation around the x-axis."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: angle
+          type: number
+
+    - name: matrix_rotate_y
+      type: function
+      desc: "Set the value of a matrix for rotation around the y-axis."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: angle
+          type: number
+
+    - name: matrix_rotate_z
+      type: function
+      desc: "Set the value of a matrix for rotation around the z-axis."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: angle
+          type: number
+
+    - name: matrix_translation
+      type: function
+      desc: "Set the value of a matrix for translation."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: position
+          type: [vector3, vector4]
