@@ -82,11 +82,11 @@
       desc: "Rotate a vector by a quaternion."
       parameters:
         - name: v_in_place
-          type: [vector3, vector4]
+          type: vector3
         - name: q
           type: quaternion
         - name: v1
-          type: [vector3, vector4]
+          type: vector3
 
     - name: vector
       type: function
@@ -256,16 +256,61 @@
         - name: m1
           type: matrix4
 
-    - name: matrix_mul
+    - name: matrix_look_at
       type: function
-      desc: "Multiply two matrices."
+      desc: "Set the value of a matrix from supplied look-at parameters."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: eye
+          type: vector3
+        - name: look_at
+          type: vector3
+        - name: up
+          type: vector3
+
+    - name: matrix4_orthographic
+      type: function
+      desc: "Set the value of an orthographic projection matrix."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: left
+          type: number
+        - name: right
+          type: number
+        - name: bottom
+          type: number
+        - name: top
+          type: number
+        - name: near
+          type: number
+        - name: far
+          type: number
+
+    - name: matrix_ortho_inv
+      type: function
+      desc: "The resulting matrix is the inverse of the supplied matrix."
       parameters:
         - name: m_in_place
           type: matrix4
         - name: m1
           type: matrix4
-        - name: m2
+
+    - name: matrix4_perspective
+      type: function
+      desc: "Set the value of a perspective projection matrix."
+      parameters:
+        - name: m_in_place
           type: matrix4
+        - name: fov
+          type: number
+        - name: aspect
+          type: number
+        - name: near
+          type: number
+        - name: far
+          type: number
 
     - name: matrix_rotate_x
       type: function
