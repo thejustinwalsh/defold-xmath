@@ -312,7 +312,7 @@
         - name: far
           type: number
 
-    - name: matrix_rotate_x
+    - name: matrix_rotation_x
       type: function
       desc: "Set the value of a matrix for rotation around the x-axis."
       parameters:
@@ -321,7 +321,7 @@
         - name: angle
           type: number
 
-    - name: matrix_rotate_y
+    - name: matrix_rotation_y
       type: function
       desc: "Set the value of a matrix for rotation around the y-axis."
       parameters:
@@ -330,7 +330,7 @@
         - name: angle
           type: number
 
-    - name: matrix_rotate_z
+    - name: matrix_rotation_z
       type: function
       desc: "Set the value of a matrix for rotation around the z-axis."
       parameters:
