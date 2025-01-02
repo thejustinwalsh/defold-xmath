@@ -15,6 +15,6 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
       - uses: dapetcu21/setup-defold@v3.0.2
       - run: 'java -jar $BOB build'
