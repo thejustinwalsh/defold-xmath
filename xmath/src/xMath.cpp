@@ -558,8 +558,8 @@ static const luaL_reg xMathModule_methods[] =
     {"quat_basis", xMath_quat_basis},
     {"quat_from_to", xMath_quat_from_to},
     {"quat_rotation_x", xMath_quat_rotation_x},
-    {"quat_rotation_y", xMath_quat_rotation_x},
-    {"quat_rotation_z", xMath_quat_rotation_x},
+    {"quat_rotation_y", xMath_quat_rotation_y},
+    {"quat_rotation_z", xMath_quat_rotation_z},
     {"quat", xMath_quat},
     //* Vector + Quat
     {"lerp", xMath_lerp},
