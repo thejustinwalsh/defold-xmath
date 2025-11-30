@@ -553,7 +553,7 @@ static int xMath_matrix4_compose(lua_State* L)
     if (dmScript::IsMatrix4(L, 1))
     {
         Vectormath::Aos::Matrix4 *out = dmScript::CheckMatrix4(L, 1);
-        Vectormath::Aos::Vector3 translation;
+        Vectormath::Aos::Vector3 translation(0, 0, 0);
         if (dmScript::IsVector3(L, 2))
         {
             translation = *dmScript::CheckVector3(L, 2);
