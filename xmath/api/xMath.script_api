@@ -347,3 +347,55 @@
           type: matrix4
         - name: position
           type: [vector3, vector4]
+
+    - name: quat_matrix4
+      type: function
+      desc: "Set the value of a quaternion from a matrix4."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: m
+          type: matrix4
+
+    - name: matrix4_compose
+      type: function
+      desc: "Set the value of a matrix from translation, rotation and scale."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: translation
+          type: [vector3, vector4]
+        - name: rotation
+          type: quaternion
+        - name: scale
+          type: vector3
+
+    - name: matrix4_scale
+      type: function
+      desc: "Set the value of a matrix from scale. Can take a vector3, a single number for uniform scale, or 3 numbers for x, y, z scale."
+      parameters:
+        - name: m_in_place
+          type: matrix4
+        - name: scale
+          type: [vector3, number]
+
+    - name: clamp
+      type: function
+      desc: "Clamp input value in range [min, max]. For numbers, pass (value, min, max) and returns the clamped number. For vectors, pass (v_in_place, value, min, max) to modify v_in_place. min and max can be numbers or matching vector types."
+      parameters:
+        - name: value_or_out
+          type: [number, vector3, vector4]
+          desc: "For numbers, the value to clamp. For vectors, the output vector to store the result."
+        - name: value_or_min
+          type: [number, vector3, vector4]
+          desc: "For numbers, the minimum value. For vectors, the value to clamp."
+        - name: min_or_max
+          type: [number, vector3, vector4]
+          desc: "For numbers, the maximum value. For vectors, the minimum value."
+        - name: max
+          type: [number, vector3, vector4]
+          desc: "For vectors only, the maximum value."
+      returns:
+        - name: result
+          type: number
+          desc: "For number inputs, returns the clamped number. For vector inputs, modifies v_in_place and returns nothing."
