@@ -1,0 +1,481 @@
+-- xmath test suite
+-- Verifies every xmath.* function against the equivalent vmath.* call (the oracle),
+-- since both wrap the same underlying Vectormath::Aos library.
+
+local EPSILON = 0.0001
+
+local results = { total = 0, passed = 0, failures = {} }
+
+local function nearly_equal(a, b)
+	return math.abs(a - b) <= EPSILON
+end
+
+local function vec3_eq(a, b)
+	return nearly_equal(a.x, b.x) and nearly_equal(a.y, b.y) and nearly_equal(a.z, b.z)
+end
+
+local function vec4_eq(a, b)
+	return nearly_equal(a.x, b.x) and nearly_equal(a.y, b.y) and nearly_equal(a.z, b.z) and nearly_equal(a.w, b.w)
+end
+
+local function quat_eq(a, b)
+	return vec4_eq(a, b)
+end
+
+local function mat4_eq(a, b)
+	return vec4_eq(a.c0, b.c0) and vec4_eq(a.c1, b.c1) and vec4_eq(a.c2, b.c2) and vec4_eq(a.c3, b.c3)
+end
+
+local function check(name, condition)
+	results.total = results.total + 1
+	if condition then
+		results.passed = results.passed + 1
+	else
+		table.insert(results.failures, name)
+	end
+end
+
+--* Arithmetic
+--* ----------------------------------------------------------------------------
+
+local function test_add()
+	local a3, b3 = vmath.vector3(1, 2, 3), vmath.vector3(4, 5, 6)
+	local out3 = vmath.vector3()
+	xmath.add(out3, a3, b3)
+	check("add(vector3)", vec3_eq(out3, a3 + b3))
+
+	local a4, b4 = vmath.vector4(1, 2, 3, 4), vmath.vector4(5, 6, 7, 8)
+	local out4 = vmath.vector4()
+	xmath.add(out4, a4, b4)
+	check("add(vector4)", vec4_eq(out4, a4 + b4))
+end
+
+local function test_sub()
+	local a3, b3 = vmath.vector3(4, 5, 6), vmath.vector3(1, 2, 3)
+	local out3 = vmath.vector3()
+	xmath.sub(out3, a3, b3)
+	check("sub(vector3)", vec3_eq(out3, a3 - b3))
+
+	local a4, b4 = vmath.vector4(5, 6, 7, 8), vmath.vector4(1, 2, 3, 4)
+	local out4 = vmath.vector4()
+	xmath.sub(out4, a4, b4)
+	check("sub(vector4)", vec4_eq(out4, a4 - b4))
+end
+
+local function test_mul()
+	local v3, n = vmath.vector3(1, 2, 3), 2.5
+	local out3 = vmath.vector3()
+	xmath.mul(out3, v3, n)
+	check("mul(vector3)", vec3_eq(out3, v3 * n))
+
+	local v4 = vmath.vector4(1, 2, 3, 4)
+	local out4 = vmath.vector4()
+	xmath.mul(out4, v4, n)
+	check("mul(vector4)", vec4_eq(out4, v4 * n))
+end
+
+local function test_div()
+	local v3, n = vmath.vector3(1, 2, 3), 2.5
+	local out3 = vmath.vector3()
+	xmath.div(out3, v3, n)
+	check("div(vector3)", vec3_eq(out3, v3 / n))
+
+	local v4 = vmath.vector4(1, 2, 3, 4)
+	local out4 = vmath.vector4()
+	xmath.div(out4, v4, n)
+	check("div(vector4)", vec4_eq(out4, v4 / n))
+end
+
+--* Vector
+--* ----------------------------------------------------------------------------
+
+local function test_cross()
+	local a, b = vmath.vector3(1, 0, 0), vmath.vector3(0, 1, 0)
+	local out = vmath.vector3()
+	xmath.cross(out, a, b)
+	check("cross", vec3_eq(out, vmath.cross(a, b)))
+end
+
+local function test_mul_per_elem()
+	local a3, b3 = vmath.vector3(2, 3, 4), vmath.vector3(5, 6, 7)
+	local out3 = vmath.vector3()
+	xmath.mul_per_elem(out3, a3, b3)
+	check("mul_per_elem(vector3)", vec3_eq(out3, vmath.mul_per_elem(a3, b3)))
+
+	local a4, b4 = vmath.vector4(2, 3, 4, 5), vmath.vector4(6, 7, 8, 9)
+	local out4 = vmath.vector4()
+	xmath.mul_per_elem(out4, a4, b4)
+	check("mul_per_elem(vector4)", vec4_eq(out4, vmath.mul_per_elem(a4, b4)))
+end
+
+local function test_normalize()
+	local v3 = vmath.vector3(3, 4, 0)
+	local out3 = vmath.vector3()
+	xmath.normalize(out3, v3)
+	check("normalize(vector3)", vec3_eq(out3, vmath.normalize(v3)))
+
+	local v4 = vmath.vector4(1, 2, 3, 4)
+	local out4 = vmath.vector4()
+	xmath.normalize(out4, v4)
+	check("normalize(vector4)", vec4_eq(out4, vmath.normalize(v4)))
+end
+
+local function test_rotate()
+	local q = vmath.quat_rotation_z(math.pi / 2)
+	local v = vmath.vector3(1, 0, 0)
+	local out = vmath.vector3()
+	xmath.rotate(out, q, v)
+	check("rotate", vec3_eq(out, vmath.rotate(q, v)))
+end
+
+local function test_vector()
+	local v3 = vmath.vector3(1, 2, 3)
+	xmath.vector(v3)
+	check("vector(vector3)", vec3_eq(v3, vmath.vector3(0, 0, 0)))
+
+	local v4 = vmath.vector4(1, 2, 3, 4)
+	xmath.vector(v4)
+	check("vector(vector4)", vec4_eq(v4, vmath.vector4(0, 0, 0, 1)))
+end
+
+--* Quat
+--* ----------------------------------------------------------------------------
+
+local function test_conj()
+	local q = vmath.quat_rotation_x(0.5)
+	local out = vmath.quat()
+	xmath.conj(out, q)
+	check("conj", quat_eq(out, vmath.conj(q)))
+end
+
+local function test_quat_axis_angle()
+	local axis, angle = vmath.vector3(0, 1, 0), math.pi / 3
+	local out = vmath.quat()
+	xmath.quat_axis_angle(out, axis, angle)
+	check("quat_axis_angle", quat_eq(out, vmath.quat_axis_angle(axis, angle)))
+end
+
+local function test_quat_basis()
+	-- basis rotated 90 degrees around Z: x -> (0,1,0), y -> (-1,0,0), z -> (0,0,1)
+	local x, y, z = vmath.vector3(0, 1, 0), vmath.vector3(-1, 0, 0), vmath.vector3(0, 0, 1)
+	local out = vmath.quat()
+	xmath.quat_basis(out, x, y, z)
+	check("quat_basis", quat_eq(out, vmath.quat_basis(x, y, z)))
+end
+
+local function test_quat_from_to()
+	local v1, v2 = vmath.vector3(1, 0, 0), vmath.vector3(0, 1, 0)
+	local out = vmath.quat()
+	xmath.quat_from_to(out, v1, v2)
+	check("quat_from_to", quat_eq(out, vmath.quat_from_to(v1, v2)))
+end
+
+local function test_quat_rotation_axes()
+	local angle = 0.7
+
+	local outx = vmath.quat()
+	xmath.quat_rotation_x(outx, angle)
+	check("quat_rotation_x", quat_eq(outx, vmath.quat_rotation_x(angle)))
+
+	local outy = vmath.quat()
+	xmath.quat_rotation_y(outy, angle)
+	check("quat_rotation_y", quat_eq(outy, vmath.quat_rotation_y(angle)))
+
+	local outz = vmath.quat()
+	xmath.quat_rotation_z(outz, angle)
+	check("quat_rotation_z", quat_eq(outz, vmath.quat_rotation_z(angle)))
+end
+
+local function test_quat()
+	local q = vmath.quat_rotation_x(1.0)
+	xmath.quat(q)
+	check("quat", quat_eq(q, vmath.quat()))
+end
+
+local function test_quat_matrix4()
+	local m = vmath.matrix4_rotation_y(0.9)
+	local out = vmath.quat()
+	xmath.quat_matrix4(out, m)
+	check("quat_matrix4", quat_eq(out, vmath.quat_matrix4(m)))
+end
+
+local function test_euler_to_quat()
+	local x, y, z = 30, 45, 60
+
+	local out1 = vmath.quat()
+	xmath.euler_to_quat(out1, x, y, z)
+	check("euler_to_quat(numbers)", quat_eq(out1, vmath.euler_to_quat(x, y, z)))
+
+	local v = vmath.vector3(x, y, z)
+	local out2 = vmath.quat()
+	xmath.euler_to_quat(out2, v)
+	check("euler_to_quat(vector3)", quat_eq(out2, vmath.euler_to_quat(v)))
+end
+
+--* Vector + Quat
+--* ----------------------------------------------------------------------------
+
+local function test_lerp()
+	local t = 0.3
+
+	check("lerp(number)", nearly_equal(xmath.lerp(t, 0, 10), vmath.lerp(t, 0, 10)))
+
+	local a3, b3 = vmath.vector3(1, 2, 3), vmath.vector3(4, 5, 6)
+	local out3 = vmath.vector3()
+	xmath.lerp(out3, t, a3, b3)
+	check("lerp(vector3)", vec3_eq(out3, vmath.lerp(t, a3, b3)))
+
+	local a4, b4 = vmath.vector4(1, 2, 3, 4), vmath.vector4(5, 6, 7, 8)
+	local out4 = vmath.vector4()
+	xmath.lerp(out4, t, a4, b4)
+	check("lerp(vector4)", vec4_eq(out4, vmath.lerp(t, a4, b4)))
+
+	local qa, qb = vmath.quat_rotation_x(0.1), vmath.quat_rotation_x(1.2)
+	local outq = vmath.quat()
+	xmath.lerp(outq, t, qa, qb)
+	check("lerp(quaternion)", quat_eq(outq, vmath.lerp(t, qa, qb)))
+end
+
+local function test_slerp()
+	local t = 0.3
+
+	local a3, b3 = vmath.vector3(1, 0, 0), vmath.vector3(0, 1, 0)
+	local out3 = vmath.vector3()
+	xmath.slerp(out3, t, a3, b3)
+	check("slerp(vector3)", vec3_eq(out3, vmath.slerp(t, a3, b3)))
+
+	local a4, b4 = vmath.vector4(1, 0, 0, 0), vmath.vector4(0, 1, 0, 0)
+	local out4 = vmath.vector4()
+	xmath.slerp(out4, t, a4, b4)
+	check("slerp(vector4)", vec4_eq(out4, vmath.slerp(t, a4, b4)))
+
+	local qa, qb = vmath.quat_rotation_x(0.1), vmath.quat_rotation_x(1.2)
+	local outq = vmath.quat()
+	xmath.slerp(outq, t, qa, qb)
+	check("slerp(quaternion)", quat_eq(outq, vmath.slerp(t, qa, qb)))
+end
+
+--* Matrix
+--* ----------------------------------------------------------------------------
+
+local function test_matrix()
+	local out_identity = vmath.matrix4_rotation_x(1.0) -- pre-fill nonzero
+	xmath.matrix(out_identity)
+	check("matrix(identity)", mat4_eq(out_identity, vmath.matrix4()))
+
+	local src = vmath.matrix4_rotation_y(0.6)
+	local out_copy = vmath.matrix4()
+	xmath.matrix(out_copy, src)
+	check("matrix(copy)", mat4_eq(out_copy, src))
+end
+
+local function test_matrix_axis_angle()
+	local axis, angle = vmath.vector3(0, 0, 1), 0.4
+	local out = vmath.matrix4()
+	xmath.matrix_axis_angle(out, axis, angle)
+	check("matrix_axis_angle", mat4_eq(out, vmath.matrix4_axis_angle(axis, angle)))
+end
+
+local function test_matrix_from_quat()
+	local q = vmath.quat_rotation_z(0.8)
+	local out = vmath.matrix4()
+	xmath.matrix_from_quat(out, q)
+	check("matrix_from_quat", mat4_eq(out, vmath.matrix4_quat(q)))
+end
+
+local function test_matrix_frustum()
+	local l, r, b, t, n, f = -1, 1, -1, 1, 1, 100
+	local out = vmath.matrix4()
+	xmath.matrix_frustum(out, l, r, b, t, n, f)
+	check("matrix_frustum", mat4_eq(out, vmath.matrix4_frustum(l, r, b, t, n, f)))
+end
+
+local function test_matrix_inv()
+	local m = vmath.matrix4_translation(vmath.vector3(1, 2, 3)) * vmath.matrix4_rotation_x(0.5)
+	local out = vmath.matrix4()
+	xmath.matrix_inv(out, m)
+	check("matrix_inv", mat4_eq(out, vmath.inv(m)))
+end
+
+local function test_matrix_look_at()
+	local eye, at, up = vmath.vector3(0, 0, 5), vmath.vector3(0, 0, 0), vmath.vector3(0, 1, 0)
+	local out = vmath.matrix4()
+	xmath.matrix_look_at(out, eye, at, up)
+	check("matrix_look_at", mat4_eq(out, vmath.matrix4_look_at(eye, at, up)))
+end
+
+local function test_matrix4_orthographic()
+	local l, r, b, t, n, f = -10, 10, -10, 10, 1, 100
+	local out = vmath.matrix4()
+	xmath.matrix4_orthographic(out, l, r, b, t, n, f)
+	check("matrix4_orthographic", mat4_eq(out, vmath.matrix4_orthographic(l, r, b, t, n, f)))
+end
+
+local function test_matrix_ortho_inv()
+	local m = vmath.matrix4_look_at(vmath.vector3(0, 0, 5), vmath.vector3(0, 0, 0), vmath.vector3(0, 1, 0))
+	local out = vmath.matrix4()
+	xmath.matrix_ortho_inv(out, m)
+	check("matrix_ortho_inv", mat4_eq(out, vmath.ortho_inv(m)))
+end
+
+local function test_matrix4_perspective()
+	local fov, aspect, near, far = math.rad(60), 16 / 9, 0.1, 1000
+	local out = vmath.matrix4()
+	xmath.matrix4_perspective(out, fov, aspect, near, far)
+	check("matrix4_perspective", mat4_eq(out, vmath.matrix4_perspective(fov, aspect, near, far)))
+end
+
+local function test_matrix_rotation_axes()
+	local angle = 0.55
+
+	local outx = vmath.matrix4()
+	xmath.matrix_rotation_x(outx, angle)
+	check("matrix_rotation_x", mat4_eq(outx, vmath.matrix4_rotation_x(angle)))
+
+	local outy = vmath.matrix4()
+	xmath.matrix_rotation_y(outy, angle)
+	check("matrix_rotation_y", mat4_eq(outy, vmath.matrix4_rotation_y(angle)))
+
+	local outz = vmath.matrix4()
+	xmath.matrix_rotation_z(outz, angle)
+	check("matrix_rotation_z", mat4_eq(outz, vmath.matrix4_rotation_z(angle)))
+end
+
+local function test_matrix_translation()
+	local pos3 = vmath.vector3(1, 2, 3)
+	local out3 = vmath.matrix4()
+	xmath.matrix_translation(out3, pos3)
+	check("matrix_translation(vector3)", mat4_eq(out3, vmath.matrix4_translation(pos3)))
+
+	local pos4 = vmath.vector4(4, 5, 6, 1)
+	local out4 = vmath.matrix4()
+	xmath.matrix_translation(out4, pos4)
+	check("matrix_translation(vector4)", mat4_eq(out4, vmath.matrix4_translation(pos4)))
+end
+
+local function test_matrix4_compose()
+	local t = vmath.vector3(1, 2, 3)
+	local r = vmath.quat_rotation_y(0.4)
+	local s = vmath.vector3(2, 2, 2)
+	local out = vmath.matrix4()
+	xmath.matrix4_compose(out, t, r, s)
+	check("matrix4_compose", mat4_eq(out, vmath.matrix4_compose(t, r, s)))
+end
+
+local function test_matrix4_scale()
+	local sv = vmath.vector3(2, 3, 4)
+	local out_v = vmath.matrix4()
+	xmath.matrix4_scale(out_v, sv)
+	check("matrix4_scale(vector3)", mat4_eq(out_v, vmath.matrix4_scale(sv)))
+
+	-- Engine's vmath.matrix4_scale rejects a  number or 3 numbers ("First argument should be number or vector3")
+	-- Report: https://github.com/defold/defold/issues/12722
+	local out_n = vmath.matrix4()
+	xmath.matrix4_scale(out_n, 2.5)
+	check("matrix4_scale(number)", mat4_eq(out_n, vmath.matrix4_scale(vmath.vector3(2.5, 2.5, 2.5))))
+
+	local out_xyz = vmath.matrix4()
+	xmath.matrix4_scale(out_xyz, 2, 3, 4)
+	check("matrix4_scale(x,y,z)", mat4_eq(out_xyz, vmath.matrix4_scale(vmath.vector3(2, 3, 4))))
+end
+
+--* Utility
+--* ----------------------------------------------------------------------------
+
+local function test_clamp_number()
+	check("clamp(number, below)", nearly_equal(xmath.clamp(-5, 0, 10), 0))
+	check("clamp(number, within)", nearly_equal(xmath.clamp(5, 0, 10), 5))
+	check("clamp(number, above)", nearly_equal(xmath.clamp(15, 0, 10), 10))
+end
+
+local function test_clamp_vector3()
+	local v = vmath.vector3(-5, 5, 15)
+	local out_scalar = vmath.vector3()
+	xmath.clamp(out_scalar, v, 0, 10)
+	check("clamp(vector3, scalar min/max)", vec3_eq(out_scalar, vmath.vector3(0, 5, 10)))
+
+	local minv, maxv = vmath.vector3(0, 0, 0), vmath.vector3(10, 10, 10)
+	local out_vec = vmath.vector3()
+	xmath.clamp(out_vec, v, minv, maxv)
+	check("clamp(vector3, vector min/max)", vec3_eq(out_vec, vmath.vector3(0, 5, 10)))
+end
+
+local function test_clamp_vector4()
+	local v = vmath.vector4(-5, 5, 15, 20)
+	local out_scalar = vmath.vector4()
+	xmath.clamp(out_scalar, v, 0, 10)
+	check("clamp(vector4, scalar min/max)", vec4_eq(out_scalar, vmath.vector4(0, 5, 10, 10)))
+
+	local minv, maxv = vmath.vector4(0, 0, 0, 0), vmath.vector4(10, 10, 10, 10)
+	local out_vec = vmath.vector4()
+	xmath.clamp(out_vec, v, minv, maxv)
+	check("clamp(vector4, vector min/max)", vec4_eq(out_vec, vmath.vector4(0, 5, 10, 10)))
+end
+
+--* Runner
+--* ----------------------------------------------------------------------------
+
+local function run_test(name, fn)
+	local ok, err = pcall(fn)
+	if not ok then
+		results.total = results.total + 1
+		table.insert(results.failures, name .. " (error: " .. tostring(err) .. ")")
+	end
+end
+
+local function run_tests()
+	run_test("test_add", test_add)
+	run_test("test_sub", test_sub)
+	run_test("test_mul", test_mul)
+	run_test("test_div", test_div)
+
+	run_test("test_cross", test_cross)
+	run_test("test_mul_per_elem", test_mul_per_elem)
+	run_test("test_normalize", test_normalize)
+	run_test("test_rotate", test_rotate)
+	run_test("test_vector", test_vector)
+
+	run_test("test_conj", test_conj)
+	run_test("test_quat_axis_angle", test_quat_axis_angle)
+	run_test("test_quat_basis", test_quat_basis)
+	run_test("test_quat_from_to", test_quat_from_to)
+	run_test("test_quat_rotation_axes", test_quat_rotation_axes)
+	run_test("test_quat", test_quat)
+	run_test("test_quat_matrix4", test_quat_matrix4)
+	run_test("test_euler_to_quat", test_euler_to_quat)
+
+	run_test("test_lerp", test_lerp)
+	run_test("test_slerp", test_slerp)
+
+	run_test("test_matrix", test_matrix)
+	run_test("test_matrix_axis_angle", test_matrix_axis_angle)
+	run_test("test_matrix_from_quat", test_matrix_from_quat)
+	run_test("test_matrix_frustum", test_matrix_frustum)
+	run_test("test_matrix_inv", test_matrix_inv)
+	run_test("test_matrix_look_at", test_matrix_look_at)
+	run_test("test_matrix4_orthographic", test_matrix4_orthographic)
+	run_test("test_matrix_ortho_inv", test_matrix_ortho_inv)
+	run_test("test_matrix4_perspective", test_matrix4_perspective)
+	run_test("test_matrix_rotation_axes", test_matrix_rotation_axes)
+	run_test("test_matrix_translation", test_matrix_translation)
+	run_test("test_matrix4_compose", test_matrix4_compose)
+	run_test("test_matrix4_scale", test_matrix4_scale)
+
+	run_test("test_clamp_number", test_clamp_number)
+	run_test("test_clamp_vector3", test_clamp_vector3)
+	run_test("test_clamp_vector4", test_clamp_vector4)
+
+	print(string.format("xmath tests: %d/%d passed", results.passed, results.total))
+	for _, name in ipairs(results.failures) do
+		print("  FAILED: " .. name)
+	end
+end
+
+function init(self)
+	local scale = vmath.vector3(1, 0.5, 0.5)
+	local result = vmath.matrix4_scale(scale)
+
+	pprint(result)
+
+	run_tests()
+end

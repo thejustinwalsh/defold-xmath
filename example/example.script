@@ -1,4 +1,3 @@
-
 local SPRITE_MAX = 500;
 local sprites = {}
 local bounds = vmath.vector3()
@@ -11,20 +10,20 @@ function init(self)
 	-- update mode in gui
 	local data = use_xmath and 'ON' or 'OFF'
 	msg.post("#gui", "change_mode", { data = data })
-	
+
 	-- collect garbage slower
 	collectgarbage('setstepmul', 1000);
 	collectgarbage('setpause', 1000);
-	
+
 	-- capture window bounds
-	bounds.x = tonumber(sys.get_config("display.width"))
-	bounds.y = tonumber(sys.get_config("display.height"));
-	
+	bounds.x = tonumber(sys.get_config_int("display.width"))
+	bounds.y = tonumber(sys.get_config_int("display.height"));
+
 	for i = 1, SPRITE_MAX do
 		local dir = vmath.vector3(0, 1, 0)
 		local t = math.rad(math.random(0, 360))
 		dir.y = math.sin(t); dir.x = math.cos(t);
-		
+
 		local pos = vmath.vector3(bounds.x / 2, bounds.y / 2, 0)
 
 		local id = factory.create("#factory", pos);
@@ -64,7 +63,7 @@ function update(self, dt)
 end
 
 function on_message(self, message_id, message, sender)
-	
+
 end
 
 function on_input(self, action_id, action)

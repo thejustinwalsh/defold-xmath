@@ -9,5 +9,5 @@ Thumbs.db
 .cproject
 builtins
 _codeql_detected_source_root
-
 /xmath/include/dmsdk/*
+/.editor_settings

@@ -173,18 +173,42 @@
         - name: q_in_place
           type: quaternion
 
+    - name: euler_to_quat
+      type: function
+      desc: "Set the value of a quaternion from Euler angles (in degrees, YZX rotation order)."
+      parameters:
+        - name: q_in_place
+          type: quaternion
+        - name: x
+          type: [number, vector3]
+          desc: "Euler angle around the x-axis in degrees, or a vector3 containing all three angles."
+        - name: y
+          type: number
+          desc: "Euler angle around the y-axis in degrees. Ignored if x is a vector3."
+        - name: z
+          type: number
+          desc: "Euler angle around the z-axis in degrees. Ignored if x is a vector3."
+
     - name: lerp
       type: function
-      desc: "Linearly interpolate between two vectors or quaternions."
+      desc: "Linearly interpolate between two numbers, vectors, or quaternions. For numbers, pass (t, n1, n2) and returns the interpolated number. For vectors/quaternions, pass (v_in_place, t, v1, v2) to modify v_in_place."
       parameters:
-        - name: v_in_place
-          type: [vector3, vector4, quaternion]
-        - name: t
-          type: number
-        - name: v1
-          type: [vector3, vector4, quaternion]
+        - name: t_or_out
+          type: [number, vector3, vector4, quaternion]
+          desc: "For numbers, the interpolation factor. For vectors/quaternions, the output value to store the result."
+        - name: n1_or_t
+          type: [number, vector3, vector4, quaternion]
+          desc: "For numbers, the start value. For vectors/quaternions, the interpolation factor."
+        - name: n2_or_v1
+          type: [number, vector3, vector4, quaternion]
+          desc: "For numbers, the end value. For vectors/quaternions, the start value."
         - name: v2
           type: [vector3, vector4, quaternion]
+          desc: "For vectors/quaternions only, the end value."
+      returns:
+        - name: result
+          type: number
+          desc: "For number inputs, returns the interpolated number. For vector/quaternion inputs, modifies v_in_place and returns nothing."
 
     - name: slerp
       type: function
