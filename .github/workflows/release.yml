@@ -106,14 +106,25 @@ jobs:
           git tag -a "${TAG}" -m "Release ${TAG}"
           git push origin "${TAG}"
 
+      - name: Create release archive
+        id: archive
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          archive="defold-xmath-${TAG}.zip"
+          git archive --format zip --output "${archive}" "${TAG}"
+          echo "path=${archive}" >> "${GITHUB_OUTPUT}"
+
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.version.outputs.tag }}
+          ARCHIVE: ${{ steps.archive.outputs.path }}
           PRERELEASE: ${{ inputs.prerelease }}
         run: |
           args=(
             "${TAG}"
+            "${ARCHIVE}"
             --title "${TAG}"
             --notes "Release ${TAG}"
           )
