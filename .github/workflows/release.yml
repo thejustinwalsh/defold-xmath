@@ -1,0 +1,125 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "Version bump to apply when version is empty"
+        required: true
+        default: "patch"
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+      version:
+        description: "Exact semantic version to release, for example 1.0.0"
+        required: false
+        type: string
+      prerelease:
+        description: "Mark the GitHub release as a prerelease"
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create release tag
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        env:
+          BUMP: ${{ inputs.bump }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${VERSION}" ]]; then
+            if [[ ! "${VERSION}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "version must use semantic version format, for example 1.0.0" >&2
+              exit 1
+            fi
+            next_version="${VERSION}"
+          else
+            latest_tag="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)"
+
+            if [[ -z "${latest_tag}" ]]; then
+              next_version="1.0.0"
+            else
+              current="${latest_tag#v}"
+              IFS='.' read -r major minor patch <<< "${current}"
+
+              case "${BUMP}" in
+                major)
+                  major=$((major + 1))
+                  minor=0
+                  patch=0
+                  ;;
+                minor)
+                  minor=$((minor + 1))
+                  patch=0
+                  ;;
+                patch)
+                  patch=$((patch + 1))
+                  ;;
+                *)
+                  echo "unknown bump '${BUMP}'" >&2
+                  exit 1
+                  ;;
+              esac
+
+              next_version="${major}.${minor}.${patch}"
+            fi
+          fi
+
+          tag="v${next_version}"
+
+          if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+            echo "tag ${tag} already exists" >&2
+            exit 1
+          fi
+
+          {
+            echo "version=${next_version}"
+            echo "tag=${tag}"
+          } >> "${GITHUB_OUTPUT}"
+
+          echo "Resolved ${tag}"
+
+      - name: Create tag
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${TAG}" -m "Release ${TAG}"
+          git push origin "${TAG}"
+
+      - name: Create GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.version.outputs.tag }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          args=(
+            "${TAG}"
+            --title "${TAG}"
+            --notes "Release ${TAG}"
+          )
+
+          if [[ "${PRERELEASE}" == "true" ]]; then
+            args+=(--prerelease)
+          fi
+
+          gh release create "${args[@]}"
